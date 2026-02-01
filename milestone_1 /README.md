@@ -1,19 +1,19 @@
 ```markdown
-IDS 568 MLOps - Milestone 1: Housing Price Prediction API
+# IDS 568 MLOps - Milestone 1: Housing Price Prediction API
 
 Author: Kiran Kumar Srinivasa
 Course: IDS 568 - MLOps 
 
 This project implements a Machine Learning API for predicting housing prices using FastAPI (Containerized) and Google Cloud Functions (Serverless). It demonstrates two different deployment strategies for the same ML model.
 
-Live Deployments
+# Live Deployments
 
 | Component | Type | URL |
 | :--- | :--- | :--- |
 | Cloud Run | Container (FastAPI) | `https://mlops-api-385501609124.us-central1.run.app` |
 | Cloud Function | Serverless (Gen 2) | `https://us-central1-mlops-milestone1-486120.cloudfunctions.net/mlops-function` |
 
-Project Structure & Artifacts
+# Project Structure & Artifacts
 
 The project is organized into the following key files. (Note: All source code is located in the `milestone_1` directory.)
 
@@ -123,7 +123,7 @@ Data flow ensures strict validation:
 
 ---
 
-## 📊 Comparative Report: Cloud Run vs. Cloud Function
+## Comparative Report: Cloud Run vs. Cloud Function
 
 | Metric | Cloud Run (Container) | Cloud Function (Serverless) |
 | --- | --- | --- |
