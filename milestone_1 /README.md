@@ -10,7 +10,7 @@ This project implements a Machine Learning API for predicting housing prices usi
 
 | Component | Type | URL |
 | :--- | :--- | :--- |
-| Cloud Run | Container (FastAPI) | `https://mlops-api-385501609124.us-central1.run.app` |
+| Cloud Run | Container (FastAPI) | `https://mlops-api-385501609124.us-central1.run.app/predict` |
 | Cloud Function | Serverless (Gen 2) | `https://us-central1-mlops-milestone1-486120.cloudfunctions.net/mlops-function` |
 
 # Project Structure & Artifacts
