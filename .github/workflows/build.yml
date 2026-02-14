@@ -1,0 +1,20 @@
+name: Milestone 2 Pipeline
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Configure Docker
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+      - name: Build and Push
+        run: |
+          cd module3/milestone2
+          docker build -t us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:latest .
+          docker push us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:latest
