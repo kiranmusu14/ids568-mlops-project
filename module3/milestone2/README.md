@@ -113,6 +113,5 @@ For detailed information on the deployment strategy, security, and troubleshooti
 ### Cloud Registry
 ![Artifact Registry](registry_result.png)
 
-**You are 100% ready to submit!** Would you like me to help you double-check the specific file structure requirements for the submission portal one last time?
 
 ```
