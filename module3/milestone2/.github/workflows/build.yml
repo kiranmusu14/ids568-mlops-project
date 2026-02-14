@@ -15,11 +15,12 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        # Notice the full path to requirements.txt
         run: pip install -r module3/milestone2/app/requirements.txt pytest httpx
       - name: Run tests
-        # Running tests from the specific directory
-        run: pytest module3/milestone2/tests/
+        # The PYTHONPATH tells Python to look inside the milestone2 folder for your 'app' module
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/module3/milestone2
+          pytest module3/milestone2/tests/
 
   build-and-push:
     needs: test
@@ -38,7 +39,6 @@ jobs:
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Build and Push Image
-        # The crucial part: we specify the folder path at the end of the docker build command
         run: |
           docker build -t us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:${{ github.ref_name }} ./module3/milestone2
           docker push us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:${{ github.ref_name }}
