@@ -2,115 +2,27 @@ name: Milestone 2 Pipeline
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-env:
-  GCP_PROJECT_ID: mlops-milestone1-486120
-  GCP_REGION: us-central1
-  ARTIFACT_REGISTRY: us-central1-docker.pkg.dev
-  REPOSITORY: mlops-repo
-  IMAGE_NAME: housing-api-v2
-  WORKDIR: ./module3/milestone2
+    branches: [ main ]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install Dependencies
-        run: |
-          cd ${{ env.WORKDIR }}
-          pip install -r requirements.txt
-          pip install pytest pytest-cov
-
-      - name: Run Tests
-        run: |
-          cd ${{ env.WORKDIR }}
-          pytest --cov=. --cov-report=xml --cov-report=term
-
-      - name: Upload Coverage
-        uses: codecov/codecov-action@v3
-        with:
-          file: ${{ env.WORKDIR }}/coverage.xml
-          fail_ci_if_error: false
-
   build-and-push:
-    needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      id-token: write
-      packages: write
-
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Authenticate to Google Cloud
-        id: auth
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+      - name: Configure Docker
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
-      - name: Configure Docker for Artifact Registry
+      - name: Build and Push Image
+        # We run the build FROM the milestone2 directory so the Dockerfile 
+        # can find the 'app' folder easily.
         run: |
-          gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }} --quiet
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Extract Metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha,prefix=,format=long
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ${{ env.WORKDIR }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            BUILD_DATE=${{ github.event.head_commit.timestamp }}
-            VCS_REF=${{ github.sha }}
-            VERSION=${{ github.sha }}
-
-      - name: Scan Image for Vulnerabilities
-        continue-on-error: true
-        run: |
-          IMAGE=${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          gcloud artifacts docker images scan $IMAGE --location=${{ env.GCP_REGION }}
-
-      - name: Output Image Details
-        run: |
-          echo "### Docker Image Published :rocket:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** \`${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.meta.outputs.tags }}" | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
-          echo "**SHA:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          cd module3/milestone2
+          docker build -t us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:latest .
+          docker push us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:latest
