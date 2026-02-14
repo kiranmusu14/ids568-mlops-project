@@ -114,4 +114,4 @@ For detailed information on the deployment strategy, security, and troubleshooti
 ![Artifact Registry](registry_result.png)
 
 
-```
+
