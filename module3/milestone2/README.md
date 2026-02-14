@@ -96,9 +96,7 @@ The GitHub Actions workflow performs the following steps on every push:
 
 ## 📄 Documentation
 
-For detailed information on the deployment strategy, security, and troubleshooting, please refer to the [RUNBOOK.md](https://www.google.com/search?q=./module3/milestone2/RUNBOOK.md).
-
-```
+For detailed information on the deployment strategy, security, and troubleshooting, please refer to the [RUNBOOK.md](./RUNBOOK.md).
 
 ---
 
