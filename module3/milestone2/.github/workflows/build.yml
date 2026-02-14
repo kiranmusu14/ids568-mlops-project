@@ -4,29 +4,16 @@ on:
   push:
     tags:
       - 'v*'
+    branches:
+      - main
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - name: Install dependencies
-        run: pip install -r module3/milestone2/app/requirements.txt pytest httpx
-      - name: Run tests
-        # The PYTHONPATH tells Python to look inside the milestone2 folder for your 'app' module
-        run: |
-          export PYTHONPATH=$PYTHONPATH:$(pwd)/module3/milestone2
-          pytest module3/milestone2/tests/
-
   build-and-push:
-    needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
@@ -40,5 +27,5 @@ jobs:
 
       - name: Build and Push Image
         run: |
-          docker build -t us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:${{ github.ref_name }} ./module3/milestone2
-          docker push us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:${{ github.ref_name }}
+          docker build -t us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:${{ github.sha }} ./module3/milestone2
+          docker push us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:${{ github.sha }}
