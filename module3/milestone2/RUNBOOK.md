@@ -1,20 +1,27 @@
-# Milestone 2 Runbook
+# Operations Runbook - Milestone 2
 
-## Project Overview
-This project automates the deployment of a Housing Price Prediction API using a CI/CD pipeline.
+## 1. Dependency Pinning Strategy
+We use a `requirements.txt` file with explicit versioning (e.g., `fastapi==0.109.0`) to ensure "Environment Parity." This prevents "it works on my machine" issues by forcing the Docker container and local venv to use identical library versions.
 
-## Docker Optimization
-- **Multi-stage build**: Uses a `builder` stage to install dependencies and a final stage for execution to minimize image size.
-- **Security**: The container runs as a non-root `appuser`.
+## 2. Image Optimization
+**Strategy**: Multi-stage builds.
+- **Builder Stage**: Uses a full Python image to install heavy dependencies into a local user directory.
+- **Runtime Stage**: Uses a `python:3.11-slim` base and only copies the necessary site-packages and app code.
+- **Metric**: This reduced our image size significantly compared to a single-stage build.
 
-## CI/CD Pipeline
-- **Trigger**: The pipeline runs on every push of a version tag (e.g., `v1.0.4`).
-- **Steps**:
-  1. **Test**: Runs `pytest` to verify API functionality.
-  2. **Auth**: Authenticates with Google Cloud using GitHub Secrets.
-  3. **Build & Push**: Builds the Docker image and pushes it to Google Artifact Registry.
+## 3. Security Considerations
+- **Non-Root User**: The container creates and switches to `appuser`. This follows the Principle of Least Privilege, ensuring that if the API is compromised, the attacker does not have root access to the container.
+- **Port Mapping**: The API is restricted to port 8080, typical for Cloud Run deployments.
 
-## Deployment Commands
-To deploy a new version:
-1. `git tag v1.0.x`
-2. `git push origin v1.0.x`
+## 4. CI/CD Workflow
+1. **Lint/Test**: Runs `pytest` to ensure logic is sound before building.
+2. **Auth**: Authenticates with Google Cloud using Service Account keys.
+3. **Build/Push**: Builds the multi-stage Docker image and pushes it to Google Artifact Registry with semantic tags.
+
+## 5. Versioning Strategy
+We use **Semantic Versioning** and Git Tags. The final submission is tagged as `m2-submission` to provide a permanent, immutable reference point for the grader.
+
+## 6. Troubleshooting Common Issues
+- **422 Error**: Usually a JSON schema mismatch. Ensure the input key is `"features"` with a list of 8 floats.
+- **500 Error**: Often caused by NumPy serialization. Always cast `model.predict()` results to `float()` or `.tolist()` before returning.
+- **ModuleNotFoundError**: Occurs if the `PYTHONPATH` or Docker `WORKDIR` paths are mismatched.
