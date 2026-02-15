@@ -1,6 +1,6 @@
 # ids568-mlops-project
 # MLOps Project: Environment & CI Setup
-[![CI Pipeline](https://github.com/kiranmusu14/ids568-mlops-project/actions/workflows/ci.yml/badge.svg)](https://github.com/kiranmusu14/ids568-mlops-project/actions/workflows/ci.yml)
+![Build Status](https://github.com/kiranmusu14/ids568-mlops-project/actions/workflows/build.yml/badge.svg?branch=main)
 
 ## Project Overview
 This repository serves as the foundational infrastructure for an end-to-end MLOps pipeline. It establishes a **deterministic, reproducible Python environment** designed to eliminate "training-serving skew" and ensure reliability across the machine learning lifecycle.
