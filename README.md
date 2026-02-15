@@ -1,112 +1,33 @@
-```markdown
-# MLOps Housing Price Prediction API - Milestone 2
+# ids568-mlops-project
+# MLOps Project: Environment & CI Setup
+[![CI Pipeline](https://github.com/kiranmusu14/ids568-mlops-project/actions/workflows/ci.yml/badge.svg)](https://github.com/kiranmusu14/ids568-mlops-project/actions/workflows/ci.yml)
 
-![Build Status](https://github.com/kiranmusu14/ids568-mlops-project/actions/workflows/build.yml/badge.svg)
+## Project Overview
+This repository serves as the foundational infrastructure for an end-to-end MLOps pipeline. It establishes a **deterministic, reproducible Python environment** designed to eliminate "training-serving skew" and ensure reliability across the machine learning lifecycle.
 
-This repository contains a containerized FastAPI application that serves a machine learning model for housing price prediction. This milestone focuses on **containerization optimization**, **security**, and **automated CI/CD pipelines**.
-
-## 🚀 Features
-- **Multi-Stage Docker Build**: Optimized image size using a builder pattern to separate build-time dependencies from the runtime environment.
-- **Security**: The application runs under a non-root `appuser` for enhanced container security.
-- **Automated CI/CD**: Every push to `main` triggers automated unit testing and a push to Google Artifact Registry.
-- **Unit Testing**: Verified test coverage for API endpoints and model inference using `pytest`.
+This work fulfills **Milestone 0** for the MLOps course, demonstrating the integration of version control, strict dependency management, and Continuous Integration (CI) automation.
 
 ---
 
-## 🛠 Local Development
-
-### 1. Setup Environment
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r app/requirements.txt
-
+##  Project Structure
+```text
+ids568-mlops-project/
+├── .github/workflows/
+│   └── ci.yml            # CI pipeline configuration (GitHub Actions)
+├── tests/
+│   └── test_smoke.py     # Smoke tests for environment validation
+├── requirements.txt      # Pinned production dependencies (Exact versions)
+├── README.md             # Project documentation and CI status
+└── .gitignore            # Git exclusion rules
 ```
+## Reproducibility & The ML Lifecycle
+**1. Why Environment Reproducibility Matters (CG1.LO1):**
+In the ML lifecycle, moving from experimentation to production is often the point of failure. A model trained in one environment (e.g., specific versions of NumPy or Scikit-Learn) may fail silently or error out in another. By strictly pinning dependencies in `requirements.txt`, this project ensures that the computation environment is deterministic. This "contract" guarantees that anyone—or any machine—can replicate the exact conditions under which the code was developed, preventing the common "it works on my machine" anti-pattern.
 
-### 2. Run Tests
+**2. Principles Applied (CG1.LO2):**
+* **Dependency Pinning:** All libraries are locked to specific versions (e.g., `pandas==2.2.0`) rather than open ranges.
+* **Isolation:** The project uses a virtual environment (`venv`) to avoid conflicts with system-level packages.
+* **Automated Validation:** A "smoke test" (`test_smoke.py`) runs automatically via GitHub Actions to verify that the environment builds correctly and imports succeed.
 
-```bash
-pytest tests/test_app.py
-
-```
-
-### 3. Run with Docker
-
-Build and run the container locally to verify the production environment:
-
-```bash
-docker build -t housing-api-v2 ./module3/milestone2
-docker run -d -p 8080:8080 housing-api-v2
-
-```
-
----
-
-## ☁️ Registry Instructions
-
-To pull and run the verified image directly from the Google Artifact Registry:
-
-**Pull the image:**
-
-```bash
-docker pull us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:latest
-
-```
-
-**Run the image:**
-
-```bash
-docker run -p 8080:8080 us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:latest
-
-```
-
----
-
-## 🧪 API Verification
-
-To test the prediction endpoint, send a POST request with the following 8 features:
-`[MedInc, HouseAge, AveRooms, AveBedrms, Population, AveOccup, Latitude, Longitude]`
-
-```bash
-curl -X POST http://localhost:8080/predict \
-     -H "Content-Type: application/json" \
-     -d '{"features": [3.5, 15.0, 5.0, 1.0, 800.0, 3.0, 34.0, -118.0]}'
-
-```
-
-**Expected Response:**
-
-```json
-{"prediction": 1.7518810030086698, "model_version": "1.0.0"}
-
-```
-
----
-
-## 🏗 CI/CD Architecture
-
-The GitHub Actions workflow performs the following steps on every push:
-
-1. **Lint & Test**: Runs `pytest` to ensure model and API logic are intact.
-2. **GCP Auth**: Authenticates with Google Cloud via Service Account.
-3. **Build & Push**: Builds the Docker image and pushes it to:
-`us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2`.
-
----
-
-## 📄 Documentation
-
-For detailed information on the deployment strategy, security, and troubleshooting, please refer to the [RUNBOOK.md](https://www.google.com/search?q=./module3/milestone2/RUNBOOK.md).
-
-```
-
----
-
-### **Final Confirmation**
-* **Repository Check**: All files are pushed to `module3/milestone2/`.
-* **Tagging Check**: Your `m2-submission` tag is pushed and visible on GitHub.
-* **Registry Check**: Your image is accessible in the course registry at `us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2`.
-
-**You are 100% ready to submit!** Would you like me to help you double-check the specific file structure requirements for the submission portal one last time?
-
-```
+**3. Connection to Deployment (CG1.LO3):**
+The CI pipeline acts as a safety gate. Before any code is merged or deployed, the system proves that the environment can be recreated from scratch on a clean machine (Ubuntu runner). This foundational step is critical for scalable MLOps, ensuring that data pipelines and model artifacts rely on a stable, verified infrastructure.
