@@ -5,11 +5,6 @@
 ## Project Overview
 This repository serves as the foundational infrastructure for an end-to-end MLOps pipeline. It establishes a **deterministic, reproducible Python environment** designed to eliminate "training-serving skew" and ensure reliability across the machine learning lifecycle.
 
-
----
-
-
-```
 ## Reproducibility & The ML Lifecycle
 **1. Why Environment Reproducibility Matters (CG1.LO1):**
 In the ML lifecycle, moving from experimentation to production is often the point of failure. A model trained in one environment (e.g., specific versions of NumPy or Scikit-Learn) may fail silently or error out in another. By strictly pinning dependencies in `requirements.txt`, this project ensures that the computation environment is deterministic. This "contract" guarantees that anyone—or any machine—can replicate the exact conditions under which the code was developed, preventing the common "it works on my machine" anti-pattern.
