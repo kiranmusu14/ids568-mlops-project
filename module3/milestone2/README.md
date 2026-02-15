@@ -1,7 +1,7 @@
 ```markdown
-# MLOps Housing Price Prediction API - Milestone 2
+# MLOps Project: Environment & CI Setup
 
-[![CI Pipeline](https://github.com/kiranmusu14/ids568-mlops-project/actions/workflows/build.yml/badge.svg)](https://github.com/kiranmusu14/ids568-mlops-project/actions/workflows/build.yml)
+![Build Status](https://github.com/kiranmusu14/ids568-mlops-project/actions/workflows/build.yml/badge.svg?branch=main)
 
 This repository contains a containerized FastAPI application that serves a machine learning model for housing price prediction. This milestone focuses on **containerization optimization**, **security**, and **automated CI/CD pipelines**.
 
