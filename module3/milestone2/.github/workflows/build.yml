@@ -5,7 +5,34 @@ on:
     branches: [ main ]
 
 jobs:
+  # --- PART 1: TEST JOB ---
+  # This ensures 'Test Integration' (1 pt) and 'Pipeline Functionality' (2 pts)
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install -r module3/milestone2/app/requirements.txt
+          pip install pytest httpx
+
+      - name: Run Tests
+        # Setting PYTHONPATH ensures the 'app' module is discoverable
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/module3/milestone2
+          pytest module3/milestone2/tests/test_app.py
+
+  # --- PART 2: BUILD & PUSH JOB ---
+  # This ensures 'Authentication & Versioning' (1 pt) and 'Registry Integration' (1 pt)
   build-and-push:
+    needs: test  # Build only runs if tests pass
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -20,9 +47,15 @@ jobs:
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Build and Push Image
-        # We run the build FROM the milestone2 directory so the Dockerfile 
-        # can find the 'app' folder easily.
         run: |
           cd module3/milestone2
-          docker build -t us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:latest .
-          docker push us-central1-docker.pkg.dev/mlops-milestone1-486120/mlops-repo/housing-api-v2:latest
+          
+          # Use a variable for the image path to avoid hardcoding
+          IMAGE_PATH="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/mlops-repo/housing-api-v2"
+          
+          # Build with both 'latest' and semantic version 'v1.0.0'
+          docker build -t ${IMAGE_PATH}:latest -t ${IMAGE_PATH}:v1.0.0 .
+          
+          # Push both tags to the Artifact Registry
+          docker push ${IMAGE_PATH}:latest
+          docker push ${IMAGE_PATH}:v1.0.0
