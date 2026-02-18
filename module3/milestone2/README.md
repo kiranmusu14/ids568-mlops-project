@@ -111,5 +111,7 @@ For detailed information on the deployment strategy, security, and troubleshooti
 ### Cloud Registry
 ![Artifact Registry](registry_result.png)
 
+### Pipeline 
+![Pipeline](pipeline.png)
 
 
